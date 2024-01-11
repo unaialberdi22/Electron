@@ -55,16 +55,59 @@ const createWindow = () => {
   }
 
   //especificaciones de menu que luego podemos usar en un render
- const templateMenu = [{
+ const templateMenu = [
+  {
     label: 'File',
-    submenu: [{
+    submenu: [
+    {
       label: 'New Product',
       accelerator: 'Ctrl+N',
       click() {
         createNewProductWindow();
       }
-    }]
-  }]
+    },
+    {
+      label: 'Remove All Products',
+      click() {
+        
+      }
+    },
+    {
+      label: 'Exit',
+      accelerator: 'Esc',
+      click() {
+        app.quit();
+      }
+    },
+  ]
+  },
+]
+ 
+//En caso de desarrollar para MAC añadir lo siguiente
+if (process.platform === 'darwin') {
+  templateMenu.unshift({
+    label: app.getName(),
+  });
+};
+
+//activar ajustes para desarrolladores 
+if (process.env.NODE_ENV !== 'production') {
+  templateMenu.push({
+    label: 'DevTools',
+    submenu: [
+      {
+        label: 'Show/Hide Dev Tools',
+        accelerator: process.platform == 'darwin' ? 'Comand+D' : 'Ctrl+D',
+        click(item, focusedWindow) {
+          focusedWindow.toggleDevTools();
+        }
+      },
+      {
+        role: 'reload'
+      }
+    ]
+  })
+}
 
   //funcion que se ejecuta cuando el programa esta listo
   app.whenReady().then(() => {
@@ -75,9 +118,15 @@ const createWindow = () => {
     app.on('window-all-closed', () => {
       if (process.platform !== 'darwin') app.quit()
     });
-  
+    
+    //si se cierra la ventana principal, se cierra todo
     mainWindow.on('closed', () => {
       app.quit();
+    });
+
+    //para cerrar la segunda ventana
+    newProductWindow.on('closed', () => {
+      newProductWindow=null;
     });
   
   })
